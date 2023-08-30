@@ -24,8 +24,10 @@ from utils import *
 #modelname = "resnet50"
 modelname = "tf_efficientnetv2_m_in21k"
 img_size = 512
-use_pose = True
+# use_pose = True
 data_path="/home/datnt114/thesis/aicity2023/code/tmp"
+use_pose = False 
+
 
 use_amp = True
 batch_size = 4
@@ -265,7 +267,7 @@ for view in views :
         torch.cuda.empty_cache()
         print(time.ctime(), 'Epoch:', epoch)
 
-        scheduler.step(epoch - 1)
+        
 
         train_loss = train_epoch(train_loader, model, optimizer, epoch=epoch)
         val_loss, acc = val_epoch(valid_loader, log_file=f, epoch=epoch)
@@ -283,5 +285,6 @@ for view in views :
         f.write(f"Best model with acc: {best} in epoch {epoch_best}\n")
         print(f"Best model with acc: {best} in epoch {epoch_best}")
 
+        scheduler.step(epoch - 1)
     f.close()
     wandb.finish()
