@@ -157,15 +157,11 @@ class Model(nn.Module):
         if target is not None:
             cat_features, y_a, y_b, lam = mixup_data(cat_features, target, mixup_alpha)
             y = self.fc(cat_features)
-            # print(type(y))
-            # print(type(y_a))
-            # print(type(y_b))
-            # print(type(lam))
             
             return y, y_a, y_b, torch.tensor(lam).to("cuda")
         else:
             y = self.fc(cat_features)
-            return y, None, None, None  # Ensure consistent output structure
+            return y
 
 
 

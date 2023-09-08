@@ -36,6 +36,7 @@ def main(args):
     mixup = args.mixup
     DEBUG = args.DEBUG
     device = args.device
+    print(repr(args))
 
     # Define loss criterion
     criterion = nn.CrossEntropyLoss().to(device=device)
@@ -149,11 +150,12 @@ def main(args):
         print(cm)
 
         log_to_file(log_file, f"\n--------------------------epoch {epoch} -------------------\n")
-        np.savetxt(log_file, cm, fmt='%d')
+        if use_log:
+            np.savetxt(log_file, cm, fmt='%d')
         log_to_file(log_file, '\n')
         for i, val in enumerate(cm):
             print(f"for class {i}: accuracy: {val[i] / sum(val) * 100}")
-            log_to_file(log_file, f"for class {i}: accuracy: {val[i] / sum(val) * 100} \n")
+            log_to_file(log_file, f"for class {i}: accuracy: {val[i] / sum(val) * 100}")
         log_to_file(log_file, f"accuracy: {acc}\n")
 
         return val_loss, acc
@@ -169,7 +171,7 @@ def main(args):
             folder_name = f"image-{modelname}"
 
         print(f"folder name: {folder_name}")
-
+        logs = None
         if use_log:
             Path(f"logs/{timeline}/{folder_name}").mkdir(parents=True, exist_ok=True)
             log_file = f"logs/{timeline}/{folder_name}/log_fold_{i}_{view}_{modelname}.txt"
@@ -261,13 +263,14 @@ def main(args):
             print(f"accuracy in epoch {epoch}: {acc}")
 
             if acc > best:
-                log_file(logs, f"save for best model with acc: {acc}\n")
+                log_to_file(logs, f"save for best model with acc: {acc}\n")
                 print(f"save for best model with acc: {acc}")
                 torch.save(model.state_dict(), os.path.join(model_path))
                 best = acc
                 epoch_best = epoch
 
-                log_to_file(logs, f"Best model with acc: {best} in epoch {epoch_best}\n")
+            
+            log_to_file(logs, f"Best model with acc: {best} in epoch {epoch_best}\n")
             print(f"Best model with acc: {best} in epoch {epoch_best}")
 
             scheduler.step(epoch - 1)
