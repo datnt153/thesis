@@ -101,10 +101,10 @@ class MyDataset(Dataset):
             # pose_data['keypoint_score'] = pose_data['keypoint_score'][:, frame:frame+60, :]
             
             pose = self.transform_pose(pose_data)
-            label = torch.tensor(label).float()
+            label = torch.tensor(label)
             
             return img, pose[0], label
 
         else:
-            label = torch.tensor(label).float()
+            label = torch.tensor(label)
             return img, label 

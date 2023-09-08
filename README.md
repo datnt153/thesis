@@ -19,4 +19,5 @@ mim install mmcv
 hien tai thi creat theo id cua khong gian mang :(.
 
 
-
+Dowload dataset in :
+https://drive.google.com/drive/folders/1w-YFVOhUmVZw8c1JGVf7T5hz_RCoDhbs?usp=sharing
