@@ -22,6 +22,7 @@ import argparse
 def main(args):
     print(f"args: {args}")
     modelname = args.modelname
+    project_name = args.project_name
     img_size = args.img_size
     data_path = args.data_path
     use_pose = args.use_pose
@@ -34,7 +35,6 @@ def main(args):
     COSINE = args.COSINE
     init_lr = args.init_lr
     mixup = args.mixup
-    DEBUG = args.DEBUG
     device = args.device
     print(repr(args))
 
@@ -160,8 +160,8 @@ def main(args):
 
         return val_loss, acc
 
-    i = 0
-    timeline = strftime("%Y_%m_%d_%H.%M.%S")
+
+    timeline = strftime("%Y_%m_%d_%H.%M")
     views = ['Dashboard', 'Rear_view', 'Right_side_window']
 
     for view in views:
@@ -171,24 +171,8 @@ def main(args):
             folder_name = f"image-{modelname}"
 
         print(f"folder name: {folder_name}")
-        logs = None
-        if use_log:
-            Path(f"logs/{timeline}/{folder_name}").mkdir(parents=True, exist_ok=True)
-            log_file = f"logs/{timeline}/{folder_name}/log_fold_{i}_{view}_{modelname}.txt"
-            logs = open(log_file, 'a')
 
-        dir_model_path = f'models/{timeline}/fold{i}/{folder_name}/{view}/'
-        model_path = f'{dir_model_path}/best_{modelname}_fold_{i}.pth'
-
-        Path(dir_model_path).mkdir(parents=True, exist_ok=True)
-
-        if use_wandb:
-            # Initialize wandb
-            wandb_name = f"train {folder_name} {img_size} bs {batch_size} with {view}"
-            run = wandb.init(project="Final thesis", name=wandb_name, group=f"{view}")
-
-            # Log hyperparameters
-            wandb.config.update({
+        configs = {
                 "model_name": modelname,
                 "use_amp": use_amp,
                 "batch_size": batch_size,
@@ -199,13 +183,40 @@ def main(args):
                 "mixup": mixup,
                 "device": device,
                 "img_size": img_size
-            })
+            }
+        logs = None
+        if use_log:
+            Path(f"logs/{timeline}").mkdir(parents=True, exist_ok=True)
+            log_file = f"logs/{timeline}/log_{view}_{folder_name}.txt"
+            logs = open(log_file, 'a')
 
-        print(f"Fold {i} view: {view}")
+            print("use logs")
+
+            logs.write("configs\n")
+            # Iterate over the dictionary items and write them to the file
+            for key, value in configs.items():
+                print(f"{key}: {value}\n")
+                logs.write(f"{key}: {value}\n")
+            print("end use logs")
+
+        dir_model_path = f'models/{timeline}/{folder_name}/{view}/'
+        model_path = f'{dir_model_path}/best_{modelname}.pth'
+
+        Path(dir_model_path).mkdir(parents=True, exist_ok=True)
+
+        if use_wandb:
+            # Initialize wandb
+            wandb_name = f"train {folder_name} imgs {img_size} bs {batch_size} {view}"
+            run = wandb.init(project=project_name, name=wandb_name, group=f"{view}")
+
+            # Log hyperparameters
+            wandb.config.update(configs)
+
+        print(f"Fold 0 view: {view}")
 
         # setup dataset
-        df_train = pd.read_csv(f"folds/fold_{i}/train_{i}.csv")
-        df_val = pd.read_csv(f"folds/fold_{i}/val_{i}.csv")
+        df_train = pd.read_csv(f"folds/fold_0/train_0.csv")
+        df_val = pd.read_csv(f"folds/fold_0/val_0.csv")
 
         df_train = df_train[df_train["view"] == view]
         df_val = df_val[df_val["view"] == view]
@@ -249,7 +260,7 @@ def main(args):
         optimizer = optim.Adam(model.parameters(), lr=init_lr)
         scheduler = CosineAnnealingLR(optimizer, n_epochs)
 
-        best = 0
+        best_acc = 0
         epoch_best = 1
         for epoch in range(1, n_epochs + 1):
 
@@ -262,17 +273,19 @@ def main(args):
             val_loss, acc = val_epoch(valid_loader, log_file=logs, epoch=epoch)
             print(f"accuracy in epoch {epoch}: {acc}")
 
-            if acc > best:
+            if acc > best_acc:
                 log_to_file(logs, f"save for best model with acc: {acc}\n")
                 print(f"save for best model with acc: {acc}")
                 torch.save(model.state_dict(), os.path.join(model_path))
-                best = acc
+                best_acc = acc
                 epoch_best = epoch
 
             
-            log_to_file(logs, f"Best model with acc: {best} in epoch {epoch_best}\n")
-            print(f"Best model with acc: {best} in epoch {epoch_best}")
+            log_to_file(logs, f"Best model with acc: {best_acc} in epoch {epoch_best}\n")
+            print(f"Best model with acc: {best_acc} in epoch {epoch_best}")
 
+            wandb_log("best acc", best_acc)
+            wandb_log("best epoch", best_acc)
             scheduler.step(epoch - 1)
 
         if use_log:
@@ -284,6 +297,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train model")
     
     parser.add_argument("--modelname", type=str, default="tf_efficientnetv2_m_in21k", help="Model name")
+    parser.add_argument("--project_name", type=str, default="Thesis master 2023", help="Project name")
     parser.add_argument("--img_size", type=int, default=512, help="Image size")
     parser.add_argument("--data_path", type=str, default="/home/datnt114/thesis/aicity2023/code/tmp", help="Data path")
     parser.add_argument("--use_pose", action="store_true", help="Use pose dataset")
@@ -296,7 +310,6 @@ if __name__ == "__main__":
     parser.add_argument("--COSINE", action="store_true", help="Use cosine")
     parser.add_argument("--init_lr", type=float, default=1e-4, help="Initial learning rate")
     parser.add_argument("--mixup", action="store_true", help="Use mixup")
-    parser.add_argument("--DEBUG", action="store_true", help="Debug mode")
     parser.add_argument("--device", type=str, default="cuda", help="Device (cuda/cpu)")
     
     args = parser.parse_args()
