@@ -199,7 +199,7 @@ def main(args):
                 logs.write(f"{key}: {value}\n")
             print("end use logs")
 
-        dir_model_path = f'models/{timeline}/{folder_name}/{view}/'
+        dir_model_path = f'models/{timeline}/{folder_name}/{view}'
         model_path = f'{dir_model_path}/best_{modelname}.pth'
 
         Path(dir_model_path).mkdir(parents=True, exist_ok=True)
@@ -233,8 +233,7 @@ def main(args):
 
         # Setup dataloader
         dataset_train = MyDataset(df=df_train, view=view, img_size=img_size, use_pose=use_pose, data_path=data_path)
-        dataset_valid = MyDataset(df=df_val, view=view, img_size=img_size, mode="valid", use_pose=use_pose,
-                                  data_path=data_path)
+        dataset_valid = MyDataset(df=df_val, view=view, img_size=img_size, mode="valid", use_pose=use_pose, data_path=data_path)
 
         print(len(dataset_train), len(dataset_valid))
 
@@ -276,7 +275,7 @@ def main(args):
             if acc > best_acc:
                 log_to_file(logs, f"save for best model with acc: {acc}\n")
                 print(f"save for best model with acc: {acc}")
-                torch.save(model.state_dict(), os.path.join(model_path))
+                torch.save(model.module.state_dict(), os.path.join(model_path))
                 best_acc = acc
                 epoch_best = epoch
 
@@ -285,7 +284,7 @@ def main(args):
             print(f"Best model with acc: {best_acc} in epoch {epoch_best}")
 
             wandb_log("best acc", best_acc)
-            wandb_log("best epoch", best_acc)
+            wandb_log("best epoch", epoch_best)
             scheduler.step(epoch - 1)
 
         if use_log:

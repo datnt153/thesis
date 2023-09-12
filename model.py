@@ -61,6 +61,7 @@ class Residual3DBlock(nn.Module):
 class Model(nn.Module):
     def __init__(self, model_name="tf_efficientnet_b0_ns", use_pose=None):
         super(Model, self).__init__()
+        print("use_pose", use_pose)
         self.use_pose=use_pose
         self.backbone = timm.create_model(model_name, pretrained=True, num_classes=16, in_chans=3 )
 
