@@ -21,3 +21,7 @@ hien tai thi creat theo id cua khong gian mang :(.
 
 Dowload dataset in :
 https://drive.google.com/drive/folders/1w-YFVOhUmVZw8c1JGVf7T5hz_RCoDhbs?usp=sharing
+
+
+Reference: 
+https://github.com/tascj/kaggle-hubmap-hacking-the-human-vasculature

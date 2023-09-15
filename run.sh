@@ -5,12 +5,17 @@ conda activate openmmlab
 # train with pose 
 #python train.py --modelname tf_efficientnetv2_m_in21k --img_size 256 --batch_size 48 --use_pose --use_log --use_wandb
 #python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 12 --use_pose --use_log --use_wandb
-python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 8 --use_pose --use_log --use_wandb
+#python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 8 --use_pose --use_log --use_wandb
+#python train.py --modelname tf_efficientnetv2_s_in21k --img_size 256 --batch_size 48 --use_pose --use_log --use_wandb
+#python train.py --modelname tf_efficientnetv2_l_in21k --img_size 256 --batch_size 16 --use_pose --use_log --use_wandb
+python train.py --modelname tf_efficientnetv2_l_in21k --img_size 512 --batch_size 4 --use_pose --use_log --use_wandb
 
 # train with image 
 #python train.py --modelname tf_efficientnetv2_m_in21k --img_size 256 --batch_size 48 --use_log --use_wandb
 #python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 12 --use_log --use_wandb
-python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 8 --use_log --use_wandb
-
+#python train.py --modelname tf_efficientnetv2_m_in21k --img_size 512 --batch_size 8 --use_log --use_wandb
+#python train.py --modelname tf_efficientnetv2_s_in21k --img_size 256 --batch_size 48 --use_log --use_wandb
+#python train.py --modelname tf_efficientnetv2_l_in21k --img_size 256 --batch_size 16 --use_log --use_wandb
+python train.py --modelname tf_efficientnetv2_l_in21k --img_size 512 --batch_size 4 --use_log --use_wandb
 
 
