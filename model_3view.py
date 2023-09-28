@@ -39,15 +39,16 @@ class Residual3DBlock(nn.Module):
     def __init__(self):
         super(Residual3DBlock, self).__init__()
 
+        img_sz = 512
         self.block = nn.Sequential(
-            nn.Conv3d(512, 512, 3, stride=1, padding=1),
-            nn.BatchNorm3d(512),
-            nn.ReLU(512)
+            nn.Conv3d(img_sz, img_sz, 3, stride=1, padding=1),
+            nn.BatchNorm3d(img_sz),
+            nn.ReLU(img_sz)
         )
 
         self.block2 = nn.Sequential(
-            nn.Conv3d(512, 512, 3, stride=1, padding=1),
-            nn.BatchNorm3d(512),
+            nn.Conv3d(img_sz, img_sz, 3, stride=1, padding=1),
+            nn.BatchNorm3d(img_sz),
         )
 
     def forward(self, images):
@@ -59,19 +60,21 @@ class Residual3DBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self):
+    def __init__(self,  model_name="tf_efficientnet_b0_ns", use_pose=None):
         super(Model, self).__init__()
-        self.backbone = timm.create_model("tf_efficientnet_b0_ns", pretrained=True, num_classes=1, in_chans=3)
-
+        print(f"model name: {model_name}")
+        self.backbone = timm.create_model(model_name, pretrained=True, num_classes=16, in_chans=3)
+        
+        img_sz = 512
         self.conv_proj = nn.Sequential(
-            nn.Conv2d(1280, 512, 1, stride=1),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(1280, img_sz, 1, stride=1),
+            nn.BatchNorm2d(img_sz),
             nn.ReLU(),
         )
 
         self.neck = nn.Sequential(
-            nn.Linear(512*3, 512*3),
-            nn.BatchNorm1d(512*3),
+            nn.Linear(img_sz*3, img_sz*3),
+            nn.BatchNorm1d(img_sz*3),
             nn.LeakyReLU(),
             nn.Dropout(0.2),
         )
@@ -82,7 +85,7 @@ class Model(nn.Module):
 
         self.pool = GeM()
 
-        self.fc = nn.Linear(512*3, 1)
+        self.fc = nn.Linear(img_sz*3, 16)
 
     def forward(self, images, feature, target=None, mixup_hidden=False, mixup_alpha=0.1, layer_mix=None):
         b, t, h, w = images.shape  # 8, 45, 512, 512
@@ -106,14 +109,13 @@ class Model(nn.Module):
         if target is not None:
             cat_features, y_a, y_b, lam = mixup_data(cat_features, target, mixup_alpha)
             y = self.fc(cat_features)
-            return y, y_a, y_b, lam
+            return y, y_a, y_b, torch.tensor(lam).to("cuda")
         else:
             y = self.fc(cat_features)
-            print(y.shape)
             return y
 
-if __name__ == "__main__":
-    model = Model()
-    im = torch.randn((8, 45, 512, 512))
-    feature = torch.randn((8, 68))
-    model(im, feature)
+# if __name__ == "__main__":
+#     model = Model()
+#     im = torch.randn((8, 45, 256, 256))
+#     feature = torch.randn((8, 68))
+#     model(im, feature)

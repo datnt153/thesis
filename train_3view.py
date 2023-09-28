@@ -16,8 +16,8 @@ from time import strftime
 from sklearn.metrics import confusion_matrix
 import argparse
 
-from model_3_view import Model
-from data_3_view import MyDataset
+from model_3view import Model
+from data_3view import MyDataset
 
 def main(args):
     print(f"args: {args}")
@@ -206,8 +206,8 @@ def main(args):
 
     if use_wandb:
         # Initialize wandb
-        wandb_name = f"train {folder_name} imgs {img_size} bs {batch_size} {view}"
-        run = wandb.init(project=project_name, name=wandb_name, group=f"{view}")
+        wandb_name = f"train {folder_name} imgs {img_size} bs {batch_size} 3 view"
+        run = wandb.init(project=project_name, name=wandb_name)
 
         # Log hyperparameters
         wandb.config.update(configs)
@@ -296,14 +296,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train model")
     
     parser.add_argument("--modelname", type=str, default="tf_efficientnetv2_m_in21k", help="Model name")
-    parser.add_argument("--project_name", type=str, default="Thesis master 2023", help="Project name")
-    parser.add_argument("--img_size", type=int, default=512, help="Image size")
+    parser.add_argument("--project_name", type=str, default="Thesis master 3 view 2023", help="Project name")
+    parser.add_argument("--img_size", type=int, default=256, help="Image size")
     parser.add_argument("--data_path", type=str, default="/home/datnt114/thesis/aicity2023/code/tmp", help="Data path")
     parser.add_argument("--use_pose", action="store_true", help="Use pose dataset")
     parser.add_argument("--use_amp", action="store_true", default=True, help="Use AMP")
     parser.add_argument("--use_wandb", action="store_true", default=False, help="Use wandb")
     parser.add_argument("--use_log", action="store_true", default=False, help="Use log")
-    parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
+    parser.add_argument("--batch_size", type=int, default=16, help="Batch size")
     parser.add_argument("--n_epochs", type=int, default=30, help="Number of epochs")
     parser.add_argument("--num_workers", type=int, default=40, help="Number of workers")
     parser.add_argument("--COSINE", action="store_true", help="Use cosine")

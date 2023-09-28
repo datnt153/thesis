@@ -79,7 +79,6 @@ class MyDataset(Dataset):
         img = np.array(imgs).transpose(1, 2, 0) 
         img = self.aug(image=img)["image"]
 
-        print(f"img.shape")
         
 
 
