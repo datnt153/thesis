@@ -78,7 +78,8 @@ def main(args):
             folder_name = f"image-{modelname}"
         
         # Set the path to the saved model
-        dir_model_path = f'models/{timeline}/{folder_name}/{view}'
+        dir_model_path = f'final_models/{modelname} imgs {img_size} bs 16/{timeline}/{folder_name}/{view}'
+        # dir_model_path = f'final_models/{timeline}/{folder_name}/{view}'
         model_path = f'{dir_model_path}/best_{modelname}.pth'
 
         # Set the path to the validation data CSV file
@@ -92,6 +93,20 @@ def main(args):
             model = torch.nn.DataParallel(model)
         model = model.to(device)
         model.load_state_dict(torch.load(model_path))
+
+        # fix if save model for 1 gpu and inference to 2 gpu 
+        # state_dict = torch.load(model_path)
+        # from collections import OrderedDict
+        # new_state_dict = OrderedDict()
+
+        # for k, v in state_dict.items():
+        #     if 'module' not in k:
+        #         k = 'module.'+k
+        #     else:
+        #         k = k.replace('features.module.', 'module.features.')
+        #     new_state_dict[k]=v
+
+        # model.load_state_dict(new_state_dict)
 
         # Load the validation dataset
         df_val = pd.read_csv(val_data_path)
@@ -117,14 +132,14 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Inference model")
     
-    parser.add_argument("--modelname", type=str, default="tf_efficientnetv2_m_in21k", help="Model name")
-    parser.add_argument("--img_size", type=int, default=512, help="Image size")
+    parser.add_argument("--modelname", type=str, default="tf_efficientnetv2_l_in21k", help="Model name")
+    parser.add_argument("--img_size", type=int, default=256, help="Image size")
     parser.add_argument("--data_path", type=str, default="/home/datnt114/thesis/aicity2023/code/tmp", help="Data path")
     parser.add_argument("--use_pose", action="store_true", help="Use pose dataset")
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
     parser.add_argument("--num_workers", type=int, default=40, help="Number of workers")
     parser.add_argument("--device", type=str, default="cuda", help="Device (cuda/cpu)")
-    parser.add_argument("--timeline", type=str, default="2023_09_11_15.50", help="Timeline train")
+    parser.add_argument("--timeline", type=str, default="2023_09_14_09.48", help="Timeline train")
 
     
     args = parser.parse_args()

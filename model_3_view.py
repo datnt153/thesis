@@ -59,9 +59,9 @@ class Residual3DBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, model_name="tf_efficientnet_b0_ns"):
+    def __init__(self):
         super(Model, self).__init__()
-        self.backbone = timm.create_model(model_name, pretrained=True, num_classes=16, in_chans=3)
+        self.backbone = timm.create_model("tf_efficientnet_b0_ns", pretrained=True, num_classes=1, in_chans=3)
 
         self.conv_proj = nn.Sequential(
             nn.Conv2d(1280, 512, 1, stride=1),
@@ -70,8 +70,8 @@ class Model(nn.Module):
         )
 
         self.neck = nn.Sequential(
-            nn.Linear(1536, 1536),
-            nn.BatchNorm1d(1536),
+            nn.Linear(512*3, 512*3),
+            nn.BatchNorm1d(512*3),
             nn.LeakyReLU(),
             nn.Dropout(0.2),
         )
@@ -82,25 +82,38 @@ class Model(nn.Module):
 
         self.pool = GeM()
 
-        self.fc = nn.Linear(512 * 3, 16)
+        self.fc = nn.Linear(512*3, 1)
 
-    def forward(self, images, target=None, mixup_hidden=False, mixup_alpha=0.1, layer_mix=None):
-        b, t, h, w = images.shape  # 2, 9, 512, 512
-        #images = images.view(b * t // 3, 3, h, w)  # 6, 3, 512, 512
-        images = images.reshape(b * t // 3, 3, h, w)  # 6, 3, 512, 512
-        backbone_maps = self.backbone.forward_features(images)  # 6, 1280, 16, 16
-        feature_maps = self.conv_proj(backbone_maps)  # 6, 512, 16, 16
+    def forward(self, images, feature, target=None, mixup_hidden=False, mixup_alpha=0.1, layer_mix=None):
+        b, t, h, w = images.shape  # 8, 45, 512, 512
+
+        images = images.view(b * t // 3, 3, h, w)  # 120, 10, 512, 512
+        backbone_maps = self.backbone.forward_features(images)  # 120, 1280, 16, 16
+
+        feature_maps = self.conv_proj(backbone_maps)  # 120, 512, 16, 16
+        # print(feature_maps.size())
         _, c, h, w = feature_maps.size()
-        feature_maps = feature_maps.contiguous().view(b * 3, c, t // 3 // 3, h, w)  
-        feature_maps = self.triple_layer(feature_maps)  # 6, 512, 5, 16, 16
-        middle_maps = feature_maps[:, :, 1, :, :]  # Get feature frame t: 6, 512, 16, 16
-        # after pool: 16, 512, 1, 1 => reshape:  8, 1024 => neck: 8, 1024
+        feature_maps = feature_maps.contiguous().view(b * 3, c, t // 3 // 3, h, w)  # 24, 512, 5, 16, 16
+        feature_maps = self.triple_layer(feature_maps)  # 24, 512, 5, 16, 16
+        middle_maps = feature_maps[:, :, 2, :, :]  # Get feature frame t: 24, 512, 16, 16
+        # after pool: 24, 512, 1, 1 => reshape:  8, 512 *3 => neck: 8, 1024
+        # print(self.pool(middle_maps).shape)
+        # print(self.pool(middle_maps).reshape(b, -1).shape)
         nn_feature = self.neck(self.pool(middle_maps).reshape(b, -1))
+        # cat_features = torch.cat([nn_feature, feature], dim=1)
+        cat_features = nn_feature
+        # print(cat_features.shape)
         if target is not None:
-            nn_feature, y_a, y_b, lam = mixup_data(nn_feature, target, mixup_alpha)
-            y = self.fc(nn_feature)
+            cat_features, y_a, y_b, lam = mixup_data(cat_features, target, mixup_alpha)
+            y = self.fc(cat_features)
             return y, y_a, y_b, lam
         else:
-            y = self.fc(nn_feature)
+            y = self.fc(cat_features)
+            print(y.shape)
             return y
 
+if __name__ == "__main__":
+    model = Model()
+    im = torch.randn((8, 45, 512, 512))
+    feature = torch.randn((8, 68))
+    model(im, feature)
