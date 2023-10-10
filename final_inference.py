@@ -46,10 +46,12 @@ def val_epoch(loader, model, device, use_pose, criterion):
     TARGETS = torch.cat(TARGETS).cpu().numpy()
     acc = np.sum(PREDS.argmax(1) == TARGETS) / len(PREDS.argmax(1)) * 100
 
+    print(f"acc")
+
     cm = confusion_matrix(TARGETS, PREDS.argmax(1))
     print(cm)
 
-    return val_loss, acc
+    return val_loss, acc, PREDS.argmax(1) , TARGETS
 
 def main(args):
     print(f"args: {args}")
@@ -111,9 +113,9 @@ def main(args):
                 # Load the saved model
                 model = Model(model_name=modelname, use_pose=use_pose)
 
-                if torch.cuda.device_count() > 1:
-                    print(f"Using {torch.cuda.device_count()} GPUs.")
-                    model = torch.nn.DataParallel(model)
+                # if torch.cuda.device_count() > 1:
+                #     print(f"Using {torch.cuda.device_count()} GPUs.")
+                #     model = torch.nn.DataParallel(model)
                 model = model.to(device)
                 model.load_state_dict(torch.load(model_path))
 
@@ -130,7 +132,15 @@ def main(args):
                                           sampler=SequentialSampler(dataset_valid), num_workers=num_workers)
 
                 # Validate the model
-                val_loss, accuracy = val_epoch(valid_loader, model, device, use_pose, criterion)
+                val_loss, accuracy, PREDS, TARGETS = val_epoch(valid_loader, model, device, use_pose, criterion)
+                print(PREDS)
+                print(TARGETS)
+                print(type(PREDS), type(TARGETS))
+                data = {'predict': PREDS, "targets": TARGETS}  
+                new = pd.DataFrame(data)
+                new.to_csv(f"{folder_name}_view_{view}.csv")
+
+
                 print(f"model path: {dir_model_path}")
                 print(f"Validation loss: {val_loss}, Accuracy: {accuracy}")
                 print()
