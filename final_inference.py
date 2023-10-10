@@ -77,22 +77,22 @@ def main(args):
             #     "bs": 16,
             #     "path": [{"time_line": "2023_09_14_09.48", "use_pose": True}, {"time_line": "2023_09_14_17.18", "use_pose": False} ],
             #     "gpus": 1
-            # 
-            # },
-            # {
 
-            #     "model_name": "tf_efficientnetv2_m_in21k",
-            #     "bs": 48,
-            #     "path": [{"time_line": "2023_09_09_16.11", "use_pose": True}, {"time_line": "2023_09_09_19.32", "use_pose": False} ],
-            #     "gpus": 2
             # },
             {
 
-                "model_name": "tf_efficientnetv2_s_in21k",
+                "model_name": "tf_efficientnetv2_m_in21k",
                 "bs": 48,
-                "path": [{"time_line": "2023_09_13_17.46", "use_pose": True}, {"time_line": "2023_09_13_20.17", "use_pose": False} ],
+                "path": [{"time_line": "2023_09_09_16.11", "use_pose": True}, {"time_line": "2023_09_09_19.32", "use_pose": False} ],
                 "gpus": 2
-            }
+            },
+            # {
+
+            #     "model_name": "tf_efficientnetv2_s_in21k",
+            #     "bs": 48,
+            #     "path": [{"time_line": "2023_09_13_17.46", "use_pose": True}, {"time_line": "2023_09_13_20.17", "use_pose": False} ],
+            #     "gpus": 2
+            # }
             ]
 
     for config in configs:
@@ -113,9 +113,9 @@ def main(args):
                 # Load the saved model
                 model = Model(model_name=modelname, use_pose=use_pose)
 
-                # if torch.cuda.device_count() > 1:
-                #     print(f"Using {torch.cuda.device_count()} GPUs.")
-                #     model = torch.nn.DataParallel(model)
+                if torch.cuda.device_count() > 1:
+                    print(f"Using {torch.cuda.device_count()} GPUs.")
+                    model = torch.nn.DataParallel(model)
                 model = model.to(device)
                 model.load_state_dict(torch.load(model_path))
 
@@ -138,7 +138,7 @@ def main(args):
                 print(type(PREDS), type(TARGETS))
                 data = {'predict': PREDS, "targets": TARGETS}  
                 new = pd.DataFrame(data)
-                new.to_csv(f"{folder_name}_view_{view}.csv")
+                new.to_csv(f"predicts/{folder_name}_view_{view}.csv")
 
 
                 print(f"model path: {dir_model_path}")
