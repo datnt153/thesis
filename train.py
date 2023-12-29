@@ -166,7 +166,7 @@ def main(args):
 
     for view in views:
         if use_pose:
-            folder_name = f"pose-{modelname}"
+            folder_name = f"pose-aagcn-{modelname}"
         else:
             folder_name = f"image-{modelname}"
 
