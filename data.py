@@ -66,6 +66,7 @@ class MyDataset(Dataset):
         fold_name = self.folder_name[idx]
         
         imgs = []
+        file_origin = f'{self.data_path}/{label}/{fold_name}/img_{frame:06d}.jpg'
         # for view in ['Dashboard', 'Rear_view', 'Right_side_window']:
 
         for i, frame_index in enumerate(range(frame, frame + window + 1, 4)):
@@ -103,8 +104,8 @@ class MyDataset(Dataset):
             pose = self.transform_pose(pose_data)
             label = torch.tensor(label)
             
-            return img, pose[0], label
+            return img, pose[0], label, file_origin
 
         else:
             label = torch.tensor(label)
-            return img, label 
+            return img, label, file_origin

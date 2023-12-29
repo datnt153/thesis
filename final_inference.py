@@ -18,19 +18,20 @@ def val_epoch(loader, model, device, use_pose, criterion):
     LOGITS = []
     PREDS = []
     TARGETS = []
+    fold_names = []
 
     bar = tqdm(loader)
     with torch.no_grad():
         for data in bar:
             if use_pose:
-                img, pose, target = data
+                img, pose, target, fold_name = data
                 img, pose, target = (
                     img.to(device),
                     pose.to(device),
                     target.long().to(device),
                 )
             else:
-                img, target = data
+                img, target, fold_name = data
                 img, target = img.to(device), target.long().to(device)
                 pose = None
             logits = model(img, pose)
@@ -42,6 +43,8 @@ def val_epoch(loader, model, device, use_pose, criterion):
             LOGITS.append(logits)
             PREDS.append(pred)
             TARGETS.append(target)
+            fold_names = fold_names + list(fold_name)
+            print(f"fold name: {fold_name}")
 
             val_loss.append(loss.detach().cpu().numpy())
             bar.set_description('val_loss: %.5f'% (val_loss[-1]))
@@ -57,7 +60,7 @@ def val_epoch(loader, model, device, use_pose, criterion):
     cm = confusion_matrix(TARGETS, PREDS.argmax(1))
     print(cm)
 
-    return val_loss, acc, PREDS.argmax(1) , TARGETS, LOGITS
+    return val_loss, acc, PREDS.argmax(1) , TARGETS, LOGITS, fold_names
 
 def main(args):
     print(f"args: {args}")
@@ -83,18 +86,17 @@ def main(args):
             "bs": 16,
             "path": [
                 {"time_line": "2023_09_14_09.48", "use_pose": True},
-                # {"time_line": "2023_09_14_17.18", "use_pose": False},
+                {"time_line": "2023_09_14_17.18", "use_pose": False},
             ],
             "gpus": 1,
         },
+
         # {
         #     "model_name": "tf_efficientnetv2_m_in21k",
         #     "bs": 48,
         #     "path": [{"time_line": "2023_09_09_16.11", "use_pose": True}, {"time_line": "2023_09_09_19.32", "use_pose": False} ],
         #     "gpus": 2
         # },
-            # {
-            # {
 
         # {
 
@@ -159,17 +161,18 @@ def main(args):
                 )
 
                 # Validate the model
-                val_loss, accuracy, PREDS, TARGETS, logits = val_epoch(
+                val_loss, accuracy, PREDS, TARGETS, logits, list_file = val_epoch(
                     valid_loader, model, device, use_pose, criterion
                 )
+                print(f"len list file: {len(list_file)}")
                 # print(PREDS)
                 # print(TARGETS)
                 # print(type(PREDS), type(TARGETS))
-                print(logits)
+                # print(logits)
                 print(f"{folder_name}_view_{view}: {accuracy}")
-                # data = {'predict': PREDS, "targets": TARGETS}
-                # new = pd.DataFrame(data)
-                # new.to_csv(f"predicts/{folder_name}_view_{view}.csv")
+                data = {"file": list_file, 'predict': PREDS, "targets": TARGETS}
+                new = pd.DataFrame(data)
+                new.to_csv(f"preds/{folder_name}_view_{view}.csv")
 
                 all_logits[folder_name].append(logits)
                 all_targets = (
@@ -181,12 +184,12 @@ def main(args):
             avg_logits = np.mean(all_logits[folder_name], axis=0)
             print(avg_logits.shape)
             avg_predict = avg_logits.argmax(1)
-            print(avg_predict)
+            # print(avg_predict)
             acc = np.mean(avg_predict == all_targets) * 100  # Calculate accuracy
             print(f"Accuracy for {folder_name}: {acc}%")
 
             # Save to CSV
-            data = {"target": all_targets, "avg_predict": avg_predict}
+            data = {"fold name": list_file, "target": all_targets, "avg_predict": avg_predict}
             df = pd.DataFrame(data)
             df.to_csv(f"{folder_name}_embedded.csv", index=False)
 

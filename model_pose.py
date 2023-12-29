@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmaction.models import STGCN
+from mmaction.models import STGCN, AAGCN
 
 
 
@@ -28,6 +28,7 @@ class Model(nn.Module):
 
         #self.stgcn = STGCN(graph_cfg=dict(layout='coco', mode='stgcn_spatial'), gcn_adaptive='init', gcn_with_res=True, tcn_type='mstcn')
         self.stgcn = STGCN(graph_cfg=dict(layout='coco', mode='stgcn_spatial'))
+        self.aagcn = AAGCN(graph_cfg=dict(layout='coco', mode='stgcn_spatial'))
         self.pool_pose = nn.AdaptiveAvgPool2d(1)
         self.fc_pose = nn.Linear(256, 32)
         # 32 for pose stgcn and 512 for efficientnet
@@ -38,7 +39,8 @@ class Model(nn.Module):
         # Pose feature
         # print(f"feature_pose shape: {feature_pose.shape}")
         # print(f"type of feature_pose: {type(feature_pose)}")
-        x = self.stgcn(feature_pose)
+        # x = self.stgcn(feature_pose)
+        x = self.aagcn(feature_pose)
         # print(f"feature_pose shape: {x.shape}")
         # N: batch size (48)
         # C: Number of channels (3)
