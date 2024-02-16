@@ -22,6 +22,8 @@ class GeM(nn.Module):
             self.eps) + ')'
 
 
+# Replace concat 2 feature img (512) and pose (32) => use alpha mix img feature  (64) and pose feature (64)
+
 def mixup_data(x, y, alpha):
     '''Compute the mixup data. Return mixed inputs, pairs of targets, and lambda'''
     if alpha > 0.:
@@ -59,26 +61,17 @@ class Residual3DBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, model_name="tf_efficientnet_b0_ns", use_pose=None):
+    def __init__(self, model_name="tf_efficientnet_b0_ns", h_dim=64, alpha=0.25):
         super(Model, self).__init__()
-        print("use_pose", use_pose)
-        self.use_pose=use_pose
         self.backbone = timm.create_model(model_name, pretrained=True, num_classes=16, in_chans=3 )
-
+        self.h_dim = h_dim
+        self.alpha = alpha
         self.conv_proj = nn.Sequential(
             nn.Conv2d(1280, 512, 1, stride=1),
-            # 2048 for restnet50 and 1280 for efficientnet
-            # nn.Conv2d(2048, 512, 1, stride=1),
+
             nn.BatchNorm2d(512),
             nn.ReLU(),
         )
-
-        # self.neck = nn.Sequential(
-        #     nn.Linear(256 * 3, 256 * 3),
-        #     nn.BatchNorm1d(256 * 3),
-        #     nn.LeakyReLU(),
-        #     nn.Dropout(0.2),
-        # )
 
 
         # with 1 view 
@@ -94,22 +87,18 @@ class Model(nn.Module):
         )
 
         self.pool = GeM()
+        self.img_fc = nn.Linear(512, h_dim)
 
-        # 32 for pose stgcn and 512 for efficientnet
-        if self.use_pose:
-            self.fc = nn.Linear(512 + 32, 16)
-        else:
-            self.fc = nn.Linear(512, 16)
 
-            
-        # Use stgcn ++
-        #self.stgcn = STGCN(graph_cfg=dict(layout='coco', mode='stgcn_spatial'), gcn_adaptive='init', gcn_with_res=True, tcn_type='mstcn')
         self.stgcn = STGCN(graph_cfg=dict(layout='coco', mode='stgcn_spatial'))
         self.pool_pose = nn.AdaptiveAvgPool2d(1)
-        self.fc_pose = nn.Linear(256, 32)
+        self.fc_pose = nn.Linear(256, h_dim)
+
+        # 32 for pose stgcn and 512 for efficientnet
+        self.fc = nn.Linear(h_dim, 16)
 
 
-    def forward(self, images, feature_pose,  target=None, mixup_hidden=False, mixup_alpha=0.1, layer_mix=None):
+    def forward(self, images, feature_pose,  target=None, mixup_alpha=0.1):
         # print(f"images shape:{images.shape}")
         # print(f"feature_pose shape:{feature_pose.shape}")
         b, t, h, w = images.shape  # 8, 15, 512, 512
@@ -136,29 +125,29 @@ class Model(nn.Module):
         # print(self.pool(middle_maps).shape)
         # print(self.pool(middle_maps).reshape(b, -1).shape)
         nn_feature = self.neck(self.pool(middle_maps).reshape(b, -1))
+        nn_feature = self.img_fc(nn_feature)
 
-        if self.use_pose:
-            # Pose feature
-            # print(f"feature_pose shape: {feature_pose.shape}")
-            # print(f"type of feature_pose: {type(feature_pose)}")
-            x = self.stgcn(feature_pose)
-            # print(f"feature_pose shape: {x.shape}")
-            N, M, C, T, V = x.shape
-            x = x.view(N * M, C, T, V)
-            x = self.pool_pose(x)
-            x = x.view(N, M, C)
-            pose_feature = x.mean(dim=1)
-            pose_feature = self.fc_pose(pose_feature)
+        # Pose feature
+        # print(f"feature_pose shape: {feature_pose.shape}")
+        # print(f"type of feature_pose: {type(feature_pose)}")
+        x = self.stgcn(feature_pose)
+        # print(f"feature_pose shape: {x.shape}")
+        N, M, C, T, V = x.shape
+        x = x.view(N * M, C, T, V)
+        x = self.pool_pose(x)
+        x = x.view(N, M, C)
+        pose_feature = x.mean(dim=1)
+        pose_feature = self.fc_pose(pose_feature)
 
-
-            cat_features = torch.cat([nn_feature, pose_feature], dim=1)
-        else: 
-            cat_features = nn_feature
+        # cat_features = torch.cat([nn_feature, pose_feature], dim=1)
+        cat_features = self.alpha * nn_feature + (1-self.alpha) * pose_feature
 
         if target is not None:
             cat_features, y_a, y_b, lam = mixup_data(cat_features, target, mixup_alpha)
+
             y = self.fc(cat_features)
-            
+            # print(f"y: {y}")
+
             return y, y_a, y_b, torch.tensor(lam).to("cuda")
         else:
             y = self.fc(cat_features)
@@ -167,17 +156,17 @@ class Model(nn.Module):
 
 
 # model = Model()
-
-
+#
+#
 # im = torch.randn((8, 15, 512, 512))
-# # Class for pose 
+# # Class for pose
 # num_joints = 17
 # batch_size, num_person, num_frames = 8, 1, 60
-
+#
 # #model.init_weights()
 # feature_pose = torch.randn(batch_size, num_person,
 #                      num_frames, num_joints, 3)
-
+#
 # # feature = torch.randn((8, 68))
 # y = model(im, feature_pose)
 # print(y.shape )
