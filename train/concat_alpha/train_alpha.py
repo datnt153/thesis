@@ -208,8 +208,8 @@ def main(args):
         print(f"Fold 0 view: {view}")
 
         # setup dataset
-        df_train = pd.read_csv(f"folds/fold_0/train_0.csv")
-        df_val = pd.read_csv(f"folds/fold_0/val_0.csv")
+        df_train = pd.read_csv(f"../../folds/fold_0/train_0.csv")
+        df_val = pd.read_csv(f"../../folds/fold_0/val_0.csv")
 
         df_train = df_train[df_train["view"] == view]
         df_val = df_val[df_val["view"] == view]

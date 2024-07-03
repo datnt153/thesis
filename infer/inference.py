@@ -78,12 +78,12 @@ def main(args):
             folder_name = f"image-{modelname}"
         
         # Set the path to the saved model
-        dir_model_path = f'final_models/{modelname} imgs {img_size} bs 16/{timeline}/{folder_name}/{view}'
+        dir_model_path = f'infer/final_models/{modelname} imgs {img_size} bs 16/{timeline}/{folder_name}/{view}'
         # dir_model_path = f'final_models/{timeline}/{folder_name}/{view}'
         model_path = f'{dir_model_path}/best_{modelname}.pth'
 
         # Set the path to the validation data CSV file
-        val_data_path = "folds/fold_0/val_0.csv"
+        val_data_path = "../folds/fold_0/val_0.csv"
 
         # Load the saved model
         model = Model(model_name=modelname, use_pose=use_pose)

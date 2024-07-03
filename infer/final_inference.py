@@ -138,7 +138,7 @@ def main(args):
                 model.load_state_dict(torch.load(model_path))
 
                 # Load the validation dataset
-                val_data_path = "folds/fold_0/val_0.csv"
+                val_data_path = "../folds/fold_0/val_0.csv"
                 df_val = pd.read_csv(val_data_path)
                 df_val = df_val[df_val["view"] == view]
 

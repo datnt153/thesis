@@ -39,7 +39,7 @@ def extract_infor(file_path):
 
 
 # Path to the directory containing the text files
-directory_path = './'
+directory_path = '/'
 
 # List to store the data for all files
 all_data = []
