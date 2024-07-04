@@ -66,9 +66,9 @@ class Model(nn.Module):
         self.backbone = timm.create_model(model_name, pretrained=True, num_classes=16, in_chans=3 )
 
         self.conv_proj = nn.Sequential(
-            # nn.Conv2d(1280, 512, 1, stride=1),
+            nn.Conv2d(1280, 512, 1, stride=1),
             # 2048 for restnet50 and 1280 for efficientnet
-            nn.Conv2d(2048, 512, 1, stride=1),
+            # nn.Conv2d(2048, 512, 1, stride=1),
             nn.BatchNorm2d(512),
             nn.ReLU(),
         )

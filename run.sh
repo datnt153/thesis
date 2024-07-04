@@ -39,6 +39,10 @@ conda activate openmmlab
 
 ## train with vgg backbone
 
+#python train.py --modelname vgg16_bn.tv_in1k --img_size 224 --batch_size 16 --use_pose --use_log --use_wandb
+#python train.py --modelname vgg16_bn.tv_in1k --img_size 224 --batch_size 48 --use_log --use_wandb
 
 
 ## Train with resnet backbone
+CUDA_VISIBLE_DEVICES=0 python train.py --modelname resnet50.a1_in1k --img_size 256 --batch_size 48 --use_pose --use_log --use_wandb
+CUDA_VISIBLE_DEVICES=0 python train.py --modelname resnet50.a1_in1k --img_size 256 --batch_size 48 --use_log --use_wandb

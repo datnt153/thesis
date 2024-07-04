@@ -255,7 +255,6 @@ def main(args):
         scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
         # We use Cosine annealing LR scheduling
-        fold = 1
         optimizer = optim.Adam(model.parameters(), lr=init_lr)
         scheduler = CosineAnnealingLR(optimizer, n_epochs)
 
@@ -275,7 +274,9 @@ def main(args):
             if acc > best_acc:
                 log_to_file(logs, f"save for best model with acc: {acc}\n")
                 print(f"save for best model with acc: {acc}")
-                torch.save(model.module.state_dict(), os.path.join(model_path))
+                save_model = model.module.state_dict() if hasattr(model, 'module') else model.state_dict()
+                torch.save(save_model, os.path.join(model_path))
+                # torch.save(model.module.state_dict(), os.path.join(model_path))
                 best_acc = acc
                 epoch_best = epoch
 
@@ -294,7 +295,6 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train model")
-    
     parser.add_argument("--modelname", type=str, default="tf_efficientnetv2_m_in21k", help="Model name")
     parser.add_argument("--project_name", type=str, default="Thesis master 2023", help="Project name")
     parser.add_argument("--img_size", type=int, default=512, help="Image size")

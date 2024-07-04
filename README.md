@@ -58,6 +58,9 @@ bash run.sh
 ```
 
 # IV. Validate 
+```angular2html
+cd infer
+```
 - Download file 'final_models.zip' in link [driver](https://drive.google.com/drive/folders/1w-YFVOhUmVZw8c1JGVf7T5hz_RCoDhbs) and `unzip` this
 - Model folder structure like:
 ```text
