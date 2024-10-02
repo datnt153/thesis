@@ -88,7 +88,7 @@ python final_inference.py
   - c3d
   - tanet 
   - tsn 
-- See detail in folde "mmaction/readme"
+- See detail in folder "mmaction/readme.md"
 
   
 # **Reference**: 
