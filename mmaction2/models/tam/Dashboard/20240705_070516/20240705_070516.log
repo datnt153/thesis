@@ -1,0 +1,1275 @@
+2024/07/05 07:05:16 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.8.18 (default, Sep 11 2023, 13:40:15) [GCC 11.2.0]
+    CUDA available: True
+    numpy_random_seed: 1215531987
+    GPU 0: NVIDIA GeForce RTX 3090
+    CUDA_HOME: /usr
+    NVCC: Cuda compilation tools, release 11.5, V11.5.119
+    GCC: gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+    PyTorch: 1.11.0+cu113
+    PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.12.0+cu113
+    OpenCV: 4.10.0
+    MMEngine: 0.8.5
+
+Runtime environment:
+    cudnn_benchmark: False
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    dist_cfg: {'backend': 'nccl'}
+    seed: 1215531987
+    diff_rank_seed: False
+    deterministic: False
+    Distributed launcher: none
+    Distributed training: False
+    GPU number: 1
+------------------------------------------------------------
+
+2024/07/05 07:05:16 - mmengine - INFO - Config:
+ann_file_test = 'data/video/Dashboard_val.txt'
+ann_file_train = 'data/video/Dashboard_train.txt'
+ann_file_val = 'data/video/Dashboard_val.txt'
+auto_scale_lr = dict(base_batch_size=64, enable=False)
+data_root = 'data'
+data_root_val = 'data'
+dataset_type = 'VideoDataset'
+default_hooks = dict(
+    checkpoint=dict(
+        interval=1, max_keep_ckpts=1, save_best='auto', type='CheckpointHook'),
+    logger=dict(ignore_last=False, interval=20, type='LoggerHook'),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    runtime_info=dict(type='RuntimeInfoHook'),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    sync_buffers=dict(type='SyncBuffersHook'),
+    timer=dict(type='IterTimerHook'))
+default_scope = 'mmaction'
+env_cfg = dict(
+    cudnn_benchmark=False,
+    dist_cfg=dict(backend='nccl'),
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
+file_client_args = dict(io_backend='disk')
+launcher = 'none'
+load_from = 'https://download.openmmlab.com/mmaction/v1.0/recognition/tanet/tanet_imagenet-pretrained-r50_8xb8-dense-1x1x8-100e_kinetics400-rgb/tanet_imagenet-pretrained-r50_8xb8-dense-1x1x8-100e_kinetics400-rgb_20220919-a34346bc.pth'
+log_level = 'INFO'
+log_processor = dict(by_epoch=True, type='LogProcessor', window_size=20)
+model = dict(
+    backbone=dict(
+        depth=50,
+        num_segments=8,
+        pretrained='torchvision://resnet50',
+        tam_cfg=None,
+        type='TANet'),
+    cls_head=dict(
+        average_clips='prob',
+        consensus=dict(dim=1, type='AvgConsensus'),
+        dropout_ratio=0.5,
+        in_channels=2048,
+        init_std=0.001,
+        num_classes=16,
+        spatial_type='avg',
+        type='TSMHead'),
+    data_preprocessor=dict(
+        format_shape='NCHW',
+        mean=[
+            123.675,
+            116.28,
+            103.5,
+        ],
+        std=[
+            58.395,
+            57.12,
+            57.375,
+        ],
+        type='ActionDataPreprocessor'),
+    type='Recognizer2D')
+optim_wrapper = dict(
+    clip_grad=dict(max_norm=20, norm_type=2),
+    constructor='TSMOptimWrapperConstructor',
+    optimizer=dict(lr=0.01, momentum=0.9, type='SGD', weight_decay=0.0001),
+    paramwise_cfg=dict(fc_lr5=True))
+param_scheduler = [
+    dict(
+        begin=0,
+        by_epoch=True,
+        end=30,
+        gamma=0.1,
+        milestones=[
+            4,
+            8,
+        ],
+        type='MultiStepLR'),
+]
+randomness = dict(deterministic=False, diff_rank_seed=False, seed=None)
+resume = False
+test_cfg = dict(type='TestLoop')
+test_dataloader = dict(
+    batch_size=1,
+    dataset=dict(
+        ann_file='data/video/Dashboard_val.txt',
+        data_prefix=dict(video='data'),
+        pipeline=[
+            dict(io_backend='disk', type='DecordInit'),
+            dict(
+                clip_len=1,
+                frame_interval=1,
+                num_clips=8,
+                test_mode=True,
+                type='DenseSampleFrames'),
+            dict(type='DecordDecode'),
+            dict(scale=(
+                -1,
+                256,
+            ), type='Resize'),
+            dict(crop_size=256, type='ThreeCrop'),
+            dict(input_format='NCHW', type='FormatShape'),
+            dict(type='PackActionInputs'),
+        ],
+        test_mode=True,
+        type='VideoDataset'),
+    num_workers=8,
+    persistent_workers=True,
+    sampler=dict(shuffle=False, type='DefaultSampler'))
+test_evaluator = dict(type='AccMetric')
+test_pipeline = [
+    dict(io_backend='disk', type='DecordInit'),
+    dict(
+        clip_len=1,
+        frame_interval=1,
+        num_clips=8,
+        test_mode=True,
+        type='DenseSampleFrames'),
+    dict(type='DecordDecode'),
+    dict(scale=(
+        -1,
+        256,
+    ), type='Resize'),
+    dict(crop_size=256, type='ThreeCrop'),
+    dict(input_format='NCHW', type='FormatShape'),
+    dict(type='PackActionInputs'),
+]
+train_cfg = dict(
+    max_epochs=30, type='EpochBasedTrainLoop', val_begin=1, val_interval=1)
+train_dataloader = dict(
+    batch_size=12,
+    dataset=dict(
+        ann_file='data/video/Dashboard_train.txt',
+        data_prefix=dict(video='data'),
+        pipeline=[
+            dict(io_backend='disk', type='DecordInit'),
+            dict(
+                clip_len=1,
+                frame_interval=1,
+                num_clips=8,
+                type='DenseSampleFrames'),
+            dict(type='DecordDecode'),
+            dict(scale=(
+                -1,
+                256,
+            ), type='Resize'),
+            dict(
+                input_size=224,
+                max_wh_scale_gap=1,
+                num_fixed_crops=13,
+                random_crop=False,
+                scales=(
+                    1,
+                    0.875,
+                    0.75,
+                    0.66,
+                ),
+                type='MultiScaleCrop'),
+            dict(keep_ratio=False, scale=(
+                224,
+                224,
+            ), type='Resize'),
+            dict(flip_ratio=0.5, type='Flip'),
+            dict(input_format='NCHW', type='FormatShape'),
+            dict(type='PackActionInputs'),
+        ],
+        type='VideoDataset'),
+    num_workers=8,
+    persistent_workers=True,
+    sampler=dict(shuffle=True, type='DefaultSampler'))
+train_pipeline = [
+    dict(io_backend='disk', type='DecordInit'),
+    dict(clip_len=1, frame_interval=1, num_clips=8, type='DenseSampleFrames'),
+    dict(type='DecordDecode'),
+    dict(scale=(
+        -1,
+        256,
+    ), type='Resize'),
+    dict(
+        input_size=224,
+        max_wh_scale_gap=1,
+        num_fixed_crops=13,
+        random_crop=False,
+        scales=(
+            1,
+            0.875,
+            0.75,
+            0.66,
+        ),
+        type='MultiScaleCrop'),
+    dict(keep_ratio=False, scale=(
+        224,
+        224,
+    ), type='Resize'),
+    dict(flip_ratio=0.5, type='Flip'),
+    dict(input_format='NCHW', type='FormatShape'),
+    dict(type='PackActionInputs'),
+]
+val_cfg = dict(type='ValLoop')
+val_dataloader = dict(
+    batch_size=8,
+    dataset=dict(
+        ann_file='data/video/Dashboard_val.txt',
+        data_prefix=dict(video='data'),
+        pipeline=[
+            dict(io_backend='disk', type='DecordInit'),
+            dict(
+                clip_len=1,
+                frame_interval=1,
+                num_clips=8,
+                test_mode=True,
+                type='DenseSampleFrames'),
+            dict(type='DecordDecode'),
+            dict(scale=(
+                -1,
+                256,
+            ), type='Resize'),
+            dict(crop_size=224, type='CenterCrop'),
+            dict(input_format='NCHW', type='FormatShape'),
+            dict(type='PackActionInputs'),
+        ],
+        test_mode=True,
+        type='VideoDataset'),
+    num_workers=8,
+    persistent_workers=True,
+    sampler=dict(shuffle=False, type='DefaultSampler'))
+val_evaluator = dict(type='AccMetric')
+val_pipeline = [
+    dict(io_backend='disk', type='DecordInit'),
+    dict(
+        clip_len=1,
+        frame_interval=1,
+        num_clips=8,
+        test_mode=True,
+        type='DenseSampleFrames'),
+    dict(type='DecordDecode'),
+    dict(scale=(
+        -1,
+        256,
+    ), type='Resize'),
+    dict(crop_size=224, type='CenterCrop'),
+    dict(input_format='NCHW', type='FormatShape'),
+    dict(type='PackActionInputs'),
+]
+view = 'Dashboard'
+vis_backends = [
+    dict(type='LocalVisBackend'),
+]
+visualizer = dict(
+    type='ActionVisualizer', vis_backends=[
+        dict(type='LocalVisBackend'),
+    ])
+work_dir = 'models/tam/Dashboard'
+
+2024/07/05 07:05:26 - mmengine - INFO - These parameters in pretrained checkpoint are not loaded: {'fc.bias', 'fc.weight'}
+2024/07/05 07:05:28 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
+2024/07/05 07:05:28 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SyncBuffersHook                    
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SyncBuffersHook                    
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_val:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+after_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+Name of parameter - Initialization information
+
+backbone.conv1.conv.weight - torch.Size([64, 3, 7, 7]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.conv1.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.conv1.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv1.conv.weight - torch.Size([64, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv1.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv1.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv3.conv.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv3.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.conv3.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.downsample.conv.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.downsample.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.block.downsample.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.L.0.weight - torch.Size([16, 64, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.L.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.L.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.0.tam.L.3.weight - torch.Size([64, 16, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv1.conv.weight - torch.Size([64, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv1.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv1.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv3.conv.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv3.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.block.conv3.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.L.0.weight - torch.Size([16, 64, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.L.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.L.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.1.tam.L.3.weight - torch.Size([64, 16, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv1.conv.weight - torch.Size([64, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv1.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv1.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv3.conv.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv3.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.block.conv3.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.L.0.weight - torch.Size([16, 64, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.L.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.L.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer1.2.tam.L.3.weight - torch.Size([64, 16, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv1.conv.weight - torch.Size([128, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv3.conv.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv3.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.conv3.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.downsample.conv.weight - torch.Size([512, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.downsample.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.block.downsample.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.L.0.weight - torch.Size([32, 128, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.L.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.L.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.0.tam.L.3.weight - torch.Size([128, 32, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv1.conv.weight - torch.Size([128, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv3.conv.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv3.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.block.conv3.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.L.0.weight - torch.Size([32, 128, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.L.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.L.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.1.tam.L.3.weight - torch.Size([128, 32, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv1.conv.weight - torch.Size([128, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv3.conv.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv3.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.block.conv3.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.L.0.weight - torch.Size([32, 128, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.L.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.L.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.2.tam.L.3.weight - torch.Size([128, 32, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv1.conv.weight - torch.Size([128, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv3.conv.weight - torch.Size([512, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv3.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.block.conv3.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.L.0.weight - torch.Size([32, 128, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.L.1.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.L.1.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer2.3.tam.L.3.weight - torch.Size([128, 32, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv1.conv.weight - torch.Size([256, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.downsample.conv.weight - torch.Size([1024, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.downsample.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.block.downsample.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.0.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv1.conv.weight - torch.Size([256, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.1.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv1.conv.weight - torch.Size([256, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.2.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv1.conv.weight - torch.Size([256, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.3.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv1.conv.weight - torch.Size([256, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.4.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv1.conv.weight - torch.Size([256, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv2.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv2.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv3.conv.weight - torch.Size([1024, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv3.bn.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.block.conv3.bn.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.L.0.weight - torch.Size([64, 256, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.L.1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.L.1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer3.5.tam.L.3.weight - torch.Size([256, 64, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv1.conv.weight - torch.Size([512, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv2.conv.weight - torch.Size([512, 512, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv2.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv2.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv3.conv.weight - torch.Size([2048, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv3.bn.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.conv3.bn.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.downsample.conv.weight - torch.Size([2048, 1024, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.downsample.bn.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.block.downsample.bn.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.L.0.weight - torch.Size([128, 512, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.L.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.L.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.0.tam.L.3.weight - torch.Size([512, 128, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv1.conv.weight - torch.Size([512, 2048, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv2.conv.weight - torch.Size([512, 512, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv2.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv2.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv3.conv.weight - torch.Size([2048, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv3.bn.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.block.conv3.bn.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.L.0.weight - torch.Size([128, 512, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.L.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.L.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.1.tam.L.3.weight - torch.Size([512, 128, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv1.conv.weight - torch.Size([512, 2048, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv2.conv.weight - torch.Size([512, 512, 3, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv2.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv2.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv3.conv.weight - torch.Size([2048, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv3.bn.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.block.conv3.bn.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.G.0.weight - torch.Size([16, 8]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.G.1.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.G.1.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.G.3.weight - torch.Size([3, 16]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.L.0.weight - torch.Size([128, 512, 3]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.L.1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.L.1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+backbone.layer4.2.tam.L.3.weight - torch.Size([512, 128, 1]): 
+The value is the same before and after calling `init_weights` of Recognizer2D  
+
+cls_head.fc_cls.weight - torch.Size([16, 2048]): 
+Initialized by user-defined `init_weights` in TSMHead  
+
+cls_head.fc_cls.bias - torch.Size([16]): 
+Initialized by user-defined `init_weights` in TSMHead  
+2024/07/05 07:05:41 - mmengine - INFO - Load checkpoint from https://download.openmmlab.com/mmaction/v1.0/recognition/tanet/tanet_imagenet-pretrained-r50_8xb8-dense-1x1x8-100e_kinetics400-rgb/tanet_imagenet-pretrained-r50_8xb8-dense-1x1x8-100e_kinetics400-rgb_20220919-a34346bc.pth
+2024/07/05 07:05:41 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+2024/07/05 07:05:41 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+2024/07/05 07:05:41 - mmengine - INFO - Checkpoints will be saved to /hdd/mmaction2/models/tam/Dashboard.
+2024/07/05 07:05:47 - mmengine - INFO - Epoch(train)  [1][ 20/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:45:49  time: 0.3035  data_time: 0.0391  memory: 10367  grad_norm: 8.4751  loss: 2.0664  top1_acc: 0.3333  top5_acc: 0.4167  loss_cls: 2.0664
+2024/07/05 07:05:53 - mmengine - INFO - Epoch(train)  [1][ 40/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:39:15  time: 0.2664  data_time: 0.0039  memory: 10367  grad_norm: 6.5561  loss: 1.8266  top1_acc: 0.5000  top5_acc: 0.5000  loss_cls: 1.8266
+2024/07/05 07:05:58 - mmengine - INFO - Epoch(train)  [1][ 60/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:36:36  time: 0.2629  data_time: 0.0041  memory: 10367  grad_norm: 4.2775  loss: 1.8056  top1_acc: 0.5833  top5_acc: 0.5833  loss_cls: 1.8056
+2024/07/05 07:06:03 - mmengine - INFO - Epoch(train)  [1][ 80/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:35:14  time: 0.2630  data_time: 0.0039  memory: 10367  grad_norm: 2.3680  loss: 1.7227  top1_acc: 0.9167  top5_acc: 0.9167  loss_cls: 1.7227
+2024/07/05 07:06:08 - mmengine - INFO - Epoch(train)  [1][100/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:34:01  time: 0.2578  data_time: 0.0039  memory: 10367  grad_norm: 3.3064  loss: 1.9327  top1_acc: 0.4167  top5_acc: 0.5833  loss_cls: 1.9327
+2024/07/05 07:06:13 - mmengine - INFO - Epoch(train)  [1][120/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:11  time: 0.2579  data_time: 0.0037  memory: 10367  grad_norm: 1.8880  loss: 1.7380  top1_acc: 0.5000  top5_acc: 0.7500  loss_cls: 1.7380
+2024/07/05 07:06:19 - mmengine - INFO - Epoch(train)  [1][140/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:40  time: 0.2599  data_time: 0.0039  memory: 10367  grad_norm: 1.5764  loss: 1.6516  top1_acc: 0.6667  top5_acc: 0.7500  loss_cls: 1.6516
+2024/07/05 07:06:24 - mmengine - INFO - Epoch(train)  [1][160/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:18  time: 0.2610  data_time: 0.0038  memory: 10367  grad_norm: 2.1457  loss: 1.8899  top1_acc: 0.5833  top5_acc: 0.7500  loss_cls: 1.8899
+2024/07/05 07:06:29 - mmengine - INFO - Epoch(train)  [1][180/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:30  time: 0.2739  data_time: 0.0040  memory: 10367  grad_norm: 1.7477  loss: 1.7034  top1_acc: 0.7500  top5_acc: 0.7500  loss_cls: 1.7034
+2024/07/05 07:06:35 - mmengine - INFO - Epoch(train)  [1][200/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:46  time: 0.2775  data_time: 0.0040  memory: 10367  grad_norm: 2.6852  loss: 1.7208  top1_acc: 0.6667  top5_acc: 0.7500  loss_cls: 1.7208
+2024/07/05 07:06:41 - mmengine - INFO - Epoch(train)  [1][220/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:03  time: 0.2804  data_time: 0.0038  memory: 10367  grad_norm: 2.2214  loss: 1.6223  top1_acc: 0.5000  top5_acc: 0.6667  loss_cls: 1.6223
+2024/07/05 07:06:46 - mmengine - INFO - Epoch(train)  [1][240/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:18  time: 0.2815  data_time: 0.0037  memory: 10367  grad_norm: 2.3527  loss: 1.6978  top1_acc: 0.5833  top5_acc: 0.6667  loss_cls: 1.6978
+2024/07/05 07:06:52 - mmengine - INFO - Epoch(train)  [1][260/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:30  time: 0.2815  data_time: 0.0038  memory: 10367  grad_norm: 2.1857  loss: 1.5178  top1_acc: 0.5000  top5_acc: 0.7500  loss_cls: 1.5178
+2024/07/05 07:06:57 - mmengine - INFO - Epoch(train)  [1][280/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:41  time: 0.2825  data_time: 0.0038  memory: 10367  grad_norm: 2.5180  loss: 1.7035  top1_acc: 0.5833  top5_acc: 0.9167  loss_cls: 1.7035
+2024/07/05 07:07:03 - mmengine - INFO - Epoch(train)  [1][300/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:35  time: 0.2715  data_time: 0.0040  memory: 10367  grad_norm: 2.5521  loss: 1.6949  top1_acc: 0.5833  top5_acc: 0.9167  loss_cls: 1.6949
+2024/07/05 07:07:08 - mmengine - INFO - Epoch(train)  [1][320/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:29  time: 0.2714  data_time: 0.0040  memory: 10367  grad_norm: 2.4262  loss: 1.5472  top1_acc: 0.5833  top5_acc: 1.0000  loss_cls: 1.5472
+2024/07/05 07:07:14 - mmengine - INFO - Epoch(train)  [1][340/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:23  time: 0.2718  data_time: 0.0040  memory: 10367  grad_norm: 3.8779  loss: 1.4162  top1_acc: 0.4167  top5_acc: 0.7500  loss_cls: 1.4162
+2024/07/05 07:07:19 - mmengine - INFO - Epoch(train)  [1][360/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:17  time: 0.2715  data_time: 0.0039  memory: 10367  grad_norm: 4.0832  loss: 1.5597  top1_acc: 0.8333  top5_acc: 0.9167  loss_cls: 1.5597
+2024/07/05 07:07:25 - mmengine - INFO - Epoch(train)  [1][380/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:33:11  time: 0.2716  data_time: 0.0040  memory: 10367  grad_norm: 4.0460  loss: 1.2514  top1_acc: 0.6667  top5_acc: 0.9167  loss_cls: 1.2514
+2024/07/05 07:07:30 - mmengine - INFO - Epoch(train)  [1][400/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:58  time: 0.2643  data_time: 0.0039  memory: 10367  grad_norm: 4.2082  loss: 1.3419  top1_acc: 0.8333  top5_acc: 1.0000  loss_cls: 1.3419
+2024/07/05 07:07:35 - mmengine - INFO - Epoch(train)  [1][420/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:42  time: 0.2606  data_time: 0.0040  memory: 10367  grad_norm: 3.8944  loss: 1.4142  top1_acc: 0.5000  top5_acc: 0.9167  loss_cls: 1.4142
+2024/07/05 07:07:40 - mmengine - INFO - Epoch(train)  [1][440/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:27  time: 0.2610  data_time: 0.0040  memory: 10367  grad_norm: 3.9878  loss: 1.2866  top1_acc: 0.5000  top5_acc: 0.5833  loss_cls: 1.2866
+2024/07/05 07:07:46 - mmengine - INFO - Epoch(train)  [1][460/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:32:13  time: 0.2608  data_time: 0.0040  memory: 10367  grad_norm: 5.8797  loss: 1.4918  top1_acc: 0.6667  top5_acc: 0.9167  loss_cls: 1.4918
+2024/07/05 07:07:51 - mmengine - INFO - Epoch(train)  [1][480/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:31:59  time: 0.2608  data_time: 0.0039  memory: 10367  grad_norm: 4.4613  loss: 1.2993  top1_acc: 0.6667  top5_acc: 1.0000  loss_cls: 1.2993
+2024/07/05 07:07:56 - mmengine - INFO - Epoch(train)  [1][500/698]  base_lr: 1.0000e-02 lr: 1.0000e-02  eta: 1:31:47  time: 0.2611  data_time: 0.0039  memory: 10367  grad_norm: 6.0620  loss: 1.2365  top1_acc: 0.5833  top5_acc: 0.9167  loss_cls: 1.2365
