@@ -58,7 +58,7 @@ bash run.sh
 ```
 
 # IV. Validate 
-```angular2html
+```bash
 cd infer
 ```
 - Download file 'final_models.zip' in link [driver](https://drive.google.com/drive/folders/1w-YFVOhUmVZw8c1JGVf7T5hz_RCoDhbs) and `unzip` this
@@ -81,7 +81,17 @@ cd infer
 python final_inference.py
 ```
 
-**Reference**: 
+
+# Compare diffirent method 
+- Add train with other algorithm like:
+  - slowfast
+  - c3d
+  - tanet 
+  - tsn 
+- See detail in folde "mmaction/readme"
+
+  
+# **Reference**: 
 - Build docker file: https://github.com/tascj/kaggle-hubmap-hacking-the-human-vasculature
 - Create dataset:  [Divedeeper - Team 83](https://github.com/vtccdivedeeper/2023AICityChallenge-Track3 )
 - Extract pose: [mmaction2](https://github.com/open-mmlab/mmaction2)
