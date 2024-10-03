@@ -103,8 +103,8 @@ class MyDataset(Dataset):
             
             pose = self.transform_pose(pose_data)
             label = torch.tensor(label)
-            return img, pose[0], label
-            # return img, pose[0], label, file_origin
+            #return img, pose[0], label
+            return img, pose[0], label, file_origin
 
         else:
             label = torch.tensor(label)
