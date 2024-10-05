@@ -61,6 +61,8 @@ Make sure to update the `data_path` variable to point to your dataset directory.
 bash run.sh
 ```
 
+Log [Wandb](https://wandb.ai/kingkong153/Thesis%20master%202023)
+
 # IV. Validation
 
 1. Navigate to the `infer` directory:
